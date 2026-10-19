@@ -3,6 +3,7 @@ pipeline {
         docker {
             image 'node:22-bookworm-slim'
             args '-u root:root'
+            alwaysPull false
         }
     }
 
@@ -31,6 +32,7 @@ pipeline {
         stage('Lint') {
             steps {
                 checkout scm
+                sh 'apt-get update && apt-get install -y --no-install-recommends git'
                 script {
                     env.GIT_SHA = sh(
                         script: 'git rev-parse --short=7 HEAD',
