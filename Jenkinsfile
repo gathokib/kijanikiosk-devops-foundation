@@ -9,7 +9,7 @@ pipeline {
 
     options {
         timestamps()
-        timeout(time: 15, unit: 'MINUTES')
+        timeout(time: 10, unit: 'MINUTES')
         skipDefaultCheckout(true)
     }
 
@@ -24,6 +24,7 @@ pipeline {
     environment {
         NEXUS_REGISTRY = 'http://nexus:8081/repository/kijanikiosk-npm/'
         PACKAGE_NAME = 'kijanikiosk-payments'
+        PACKAGE_VERSION = ''
     }
 
     stages {
@@ -59,15 +60,17 @@ pipeline {
                     if (params.FAIL_STAGE == 'Build') {
                         error('Injected failure: Build')
                     }
+
+                    env.PACKAGE_VERSION = sh(
+                        script: '''GIT_SHA=$(git rev-parse --short=7 HEAD)
+BASE_VERSION=$(node -p "require('./package.json').version")
+printf '%s-%s' "$BASE_VERSION" "$GIT_SHA"''',
+                        returnStdout: true
+                    ).trim()
                 }
 
                 sh '''
                     set -eu
-
-                    GIT_SHA=$(git rev-parse --short=7 HEAD)
-                    BASE_VERSION=$(node -p "require('./package.json').version")
-                    PACKAGE_VERSION="${BASE_VERSION}-${GIT_SHA}"
-
                     printf '%s\\n' "$PACKAGE_VERSION" > .package-version
 
                     echo "Building package: $PACKAGE_NAME@$PACKAGE_VERSION"
@@ -162,8 +165,8 @@ pipeline {
                             "//$NEXUS_HOST_PATH/:_auth=$AUTH" \
                             "always-auth=true" > .npmrc
 
-                        # The leading ./ is required: without it npm treats
-                        # "dist/<file>.tgz" as a GitHub user/repo shorthand.
+                        echo 'Publishing with Jenkins-managed credentials (secret values are not logged).'
+
                         npm publish "./dist/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" \
                             --registry="$NEXUS_REGISTRY"
 
@@ -181,18 +184,16 @@ pipeline {
                 testResults: 'reports/junit.xml'
             )
 
-            echo 'CI pipeline finished. Check the stages above for results.'
+            echo 'CI pipeline finished. Review the stage results above.'
 
-            // Container runs as root, so hand files back to the Jenkins user
-            // (uid 1000) before deleteDir() runs as a non-root process.
             sh 'chown -R 1000:1000 "$WORKSPACE" || true'
-            deleteDir()
+            cleanWs()
         }
 
         success {
             echo 'CI pipeline completed successfully.'
-            echo "Package: ${env.PACKAGE_NAME}"
-            echo "Registry: ${env.NEXUS_REGISTRY}"
+            echo "Package: ${env.PACKAGE_NAME}@${env.PACKAGE_VERSION}"
+            echo "Artifact URL: ${env.NEXUS_REGISTRY}${env.PACKAGE_NAME}/-/${env.PACKAGE_NAME}-${env.PACKAGE_VERSION}.tgz"
         }
 
         failure {

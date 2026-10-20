@@ -1,0 +1,29 @@
+KijaniKiosk CI Pipeline — Successful Recovery Run
+
+Result: SUCCESS
+Git commit: 76e4eb8ca570f997a0cc865677c6950ba3992cc4
+Package: kijanikiosk-payments
+Published version: 1.0.0-76e4eb8
+Registry: http://nexus:8081/repository/kijanikiosk-npm/
+
+Stage results:
+- Lint: SUCCESS
+- Build: SUCCESS
+- Verify: SUCCESS
+  - Test branch completed
+  - Security audit reported zero vulnerabilities
+- Archive: SUCCESS
+  - Package tarball created and archived
+- Publish: SUCCESS
+  - Package published to Nexus
+
+Post-build:
+- JUnit results recorded
+- Temporary .npmrc removed
+- Workspace cleanup completed
+
+Final console result: Finished: SUCCESS
+
+Purpose:
+This run confirms that the pipeline succeeds when FAIL_STAGE=None
+after the five intentional failure-injection tests.
