@@ -1,29 +1,470 @@
-KijaniKiosk CI Pipeline — Successful Recovery Run
+Started by user Janine Kibiru
 
-Result: SUCCESS
-Git commit: 76e4eb8ca570f997a0cc865677c6950ba3992cc4
-Package: kijanikiosk-payments
-Published version: 1.0.0-76e4eb8
-Registry: http://nexus:8081/repository/kijanikiosk-npm/
-
-Stage results:
-- Lint: SUCCESS
-- Build: SUCCESS
-- Verify: SUCCESS
-  - Test branch completed
-  - Security audit reported zero vulnerabilities
-- Archive: SUCCESS
-  - Package tarball created and archived
-- Publish: SUCCESS
-  - Package published to Nexus
-
-Post-build:
-- JUnit results recorded
-- Temporary .npmrc removed
-- Workspace cleanup completed
-
-Final console result: Finished: SUCCESS
-
-Purpose:
-This run confirms that the pipeline succeeds when FAIL_STAGE=None
-after the five intentional failure-injection tests.
+Obtained Jenkinsfile from git https://github.com/gathokib/kijanikiosk-devops-foundation.git
+[Pipeline] Start of Pipeline
+[Pipeline] node
+Running on Jenkins
+ in /var/jenkins_home/workspace/kijanikiosk-ci
+[Pipeline] {
+[Pipeline] isUnix
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] sh
++ docker inspect -f . node:22-bookworm-slim
+.
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] withDockerContainer
+Jenkins seems to be running inside container f4d732b8d9f28d158fe8aaa3bc9ff642f3dc4ecd51e97df3e06c5840372741e5
+$ docker run -t -d -u 1000:1000 --network ci_default -u root:root -w /var/jenkins_home/workspace/kijanikiosk-ci --volumes-from f4d732b8d9f28d158fe8aaa3bc9ff642f3dc4ecd51e97df3e06c5840372741e5 -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** -e ******** node:22-bookworm-slim cat
+$ docker top 59fcf35908ee65e00fb6fb9b14c985eb1969bfd6bd49103570df3f67bc2aa272 -eo pid,comm
+[Pipeline] {
+[Pipeline] withEnv
+[Pipeline] {
+[Pipeline] timestamps
+[Pipeline] {
+[Pipeline] timeout
+10:26:10  Timeout set to expire in 10 min
+[Pipeline] {
+[Pipeline] stage
+[Pipeline] { (Lint)
+[Pipeline] checkout
+10:26:10  Selected Git installation does not exist. Using Default
+10:26:10  The recommended git tool is: NONE
+10:26:10  No credentials specified
+10:26:10  Warning: JENKINS-30600: special launcher org.jenkinsci.plugins.docker.workflow.WithContainerStep$Decorator$1@792da245; decorates hudson.Launcher$LocalLauncher@77ea4310 will be ignored (a typical symptom is the Git executable not being run inside a designated container)
+10:26:10  Cloning the remote Git repository
+10:26:10  Cloning repository https://github.com/gathokib/kijanikiosk-devops-foundation.git
+10:26:10   > git init /var/jenkins_home/workspace/kijanikiosk-ci # timeout=10
+10:26:10  Fetching upstream changes from https://github.com/gathokib/kijanikiosk-devops-foundation.git
+10:26:10   > git --version # timeout=10
+10:26:10   > git --version # 'git version 2.47.3'
+10:26:10   > git fetch --tags --force --progress -- https://github.com/gathokib/kijanikiosk-devops-foundation.git +refs/heads/*:refs/remotes/origin/* # timeout=10
+10:26:12   > git config remote.origin.url https://github.com/gathokib/kijanikiosk-devops-foundation.git # timeout=10
+10:26:12   > git config --add remote.origin.fetch +refs/heads/*:refs/remotes/origin/* # timeout=10
+10:26:12  Avoid second fetch
+10:26:12   > git rev-parse refs/remotes/origin/feature/week5-ci-pipeline^{commit} # timeout=10
+10:26:12  Checking out Revision 3be657f80be30eb70a2233e74287329f003a9455 (refs/remotes/origin/feature/week5-ci-pipeline)
+10:26:12   > git config core.sparsecheckout # timeout=10
+10:26:12   > git checkout -f 3be657f80be30eb70a2233e74287329f003a9455 # timeout=10
+10:26:12  Commit message: "Fix dynamic package version in CI build"
+10:26:12   > git rev-list --no-walk 56e69d9de1660caee5f54546c163155b02bd883b # timeout=10
+[Pipeline] sh
+10:26:12  + set -eu
+10:26:12  + apt-get update
+10:26:13  Get:1 http://deb.debian.org/debian bookworm InRelease [151 kB]
+10:26:13  Get:2 http://deb.debian.org/debian bookworm-updates InRelease [55.4 kB]
+10:26:13  Get:3 http://deb.debian.org/debian-security bookworm-security InRelease [34.8 kB]
+10:26:13  Get:4 http://deb.debian.org/debian bookworm/main amd64 Packages [8790 kB]
+10:26:17  Get:5 http://deb.debian.org/debian bookworm-updates/main amd64 Packages [6924 B]
+10:26:17  Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 Packages [354 kB]
+10:26:18  Fetched 9393 kB in 6s (1538 kB/s)
+10:26:19  Reading package lists...
+10:26:19  + apt-get install -y --no-install-recommends git
+10:26:20  Reading package lists...
+10:26:20  Building dependency tree...
+10:26:20  Reading state information...
+10:26:20  The following additional packages will be installed:
+10:26:20    git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1 libgdbm-compat4
+10:26:20    libgdbm6 libgssapi-krb5-2 libk5crypto3 libkeyutils1 libkrb5-3
+10:26:20    libkrb5support0 libldap-2.5-0 libnghttp2-14 libperl5.36 libpsl5 librtmp1
+10:26:20    libsasl2-2 libsasl2-modules-db libssh2-1 libssl3 perl perl-base
+10:26:20    perl-modules-5.36
+10:26:20  Suggested packages:
+10:26:20    gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-email git-gui
+10:26:20    gitk gitweb git-cvs git-mediawiki git-svn gdbm-l10n krb5-doc krb5-user
+10:26:20    sensible-utils perl-doc libterm-readline-gnu-perl
+10:26:20    | libterm-readline-perl-perl make libtap-harness-archive-perl
+10:26:20  Recommended packages:
+10:26:20    ca-certificates patch less ssh-client krb5-locales libldap-common
+10:26:20    publicsuffix libsasl2-modules netbase
+10:26:21  The following NEW packages will be installed:
+10:26:21    git git-man libbrotli1 libcurl3-gnutls liberror-perl libexpat1
+10:26:21    libgdbm-compat4 libgdbm6 libgssapi-krb5-2 libk5crypto3 libkeyutils1
+10:26:21    libkrb5-3 libkrb5support0 libldap-2.5-0 libnghttp2-14 libperl5.36 libpsl5
+10:26:21    librtmp1 libsasl2-2 libsasl2-modules-db libssh2-1 libssl3 perl
+10:26:21    perl-modules-5.36
+10:26:21  The following packages will be upgraded:
+10:26:21    perl-base
+10:26:21  1 upgraded, 24 newly installed, 0 to remove and 0 not upgraded.
+10:26:21  Need to get 22.4 MB of archives.
+10:26:21  After this operation, 109 MB of additional disk space will be used.
+10:26:21  Get:1 http://deb.debian.org/debian-security bookworm-security/main amd64 perl-base amd64 5.36.0-7+deb12u4 [1610 kB]
+10:26:22  Get:2 http://deb.debian.org/debian-security bookworm-security/main amd64 perl-modules-5.36 all 5.36.0-7+deb12u4 [2817 kB]
+10:26:23  Get:3 http://deb.debian.org/debian bookworm/main amd64 libgdbm6 amd64 1.23-3 [72.2 kB]
+10:26:23  Get:4 http://deb.debian.org/debian bookworm/main amd64 libgdbm-compat4 amd64 1.23-3 [48.2 kB]
+10:26:23  Get:5 http://deb.debian.org/debian-security bookworm-security/main amd64 libperl5.36 amd64 5.36.0-7+deb12u4 [4208 kB]
+10:26:25  Get:6 http://deb.debian.org/debian-security bookworm-security/main amd64 perl amd64 5.36.0-7+deb12u4 [239 kB]
+10:26:25  Get:7 http://deb.debian.org/debian bookworm/main amd64 libbrotli1 amd64 1.0.9-2+b6 [275 kB]
+10:26:25  Get:8 http://deb.debian.org/debian bookworm/main amd64 libkrb5support0 amd64 1.20.1-2+deb12u5 [33.2 kB]
+10:26:25  Get:9 http://deb.debian.org/debian bookworm/main amd64 libk5crypto3 amd64 1.20.1-2+deb12u5 [79.7 kB]
+10:26:25  Get:10 http://deb.debian.org/debian bookworm/main amd64 libkeyutils1 amd64 1.6.3-2 [8808 B]
+10:26:25  Get:11 http://deb.debian.org/debian-security bookworm-security/main amd64 libssl3 amd64 3.0.22-1~deb12u1 [2039 kB]
+10:26:26  Get:12 http://deb.debian.org/debian bookworm/main amd64 libkrb5-3 amd64 1.20.1-2+deb12u5 [332 kB]
+10:26:26  Get:13 http://deb.debian.org/debian bookworm/main amd64 libgssapi-krb5-2 amd64 1.20.1-2+deb12u5 [135 kB]
+10:26:26  Get:14 http://deb.debian.org/debian bookworm/main amd64 libsasl2-modules-db amd64 2.1.28+dfsg-10 [20.3 kB]
+10:26:26  Get:15 http://deb.debian.org/debian bookworm/main amd64 libsasl2-2 amd64 2.1.28+dfsg-10 [59.7 kB]
+10:26:26  Get:16 http://deb.debian.org/debian bookworm/main amd64 libldap-2.5-0 amd64 2.5.13+dfsg-5 [183 kB]
+10:26:26  Get:17 http://deb.debian.org/debian bookworm/main amd64 libnghttp2-14 amd64 1.52.0-1+deb12u3 [72.4 kB]
+10:26:26  Get:18 http://deb.debian.org/debian bookworm/main amd64 libpsl5 amd64 0.21.2-1 [58.7 kB]
+10:26:26  Get:19 http://deb.debian.org/debian bookworm/main amd64 librtmp1 amd64 2.4+20151223.gitfa8646d.1-2+b2 [60.8 kB]
+10:26:26  Get:20 http://deb.debian.org/debian-security bookworm-security/main amd64 libssh2-1 amd64 1.10.0-3+deb12u1 [176 kB]
+10:26:26  Get:21 http://deb.debian.org/debian bookworm/main amd64 libcurl3-gnutls amd64 7.88.1-10+deb12u15 [386 kB]
+10:26:26  Get:22 http://deb.debian.org/debian-security bookworm-security/main amd64 libexpat1 amd64 2.5.0-1+deb12u4 [106 kB]
+10:26:26  Get:23 http://deb.debian.org/debian bookworm/main amd64 liberror-perl all 0.17029-2 [29.0 kB]
+10:26:26  Get:24 http://deb.debian.org/debian bookworm/main amd64 git-man all 1:2.39.5-0+deb12u3 [2053 kB]
+10:26:27  Get:25 http://deb.debian.org/debian bookworm/main amd64 git amd64 1:2.39.5-0+deb12u3 [7264 kB]
+10:26:32  debconf: delaying package configuration, since apt-utils is not installed
+10:26:32  Fetched 22.4 MB in 10s (2298 kB/s)
+10:26:32  (Reading database ...
+10:26:32  (Reading database ... 5%
+10:26:32  (Reading database ... 10%
+10:26:32  (Reading database ... 15%
+10:26:32  (Reading database ... 20%
+10:26:32  (Reading database ... 25%
+10:26:32  (Reading database ... 30%
+10:26:32  (Reading database ... 35%
+10:26:32  (Reading database ... 40%
+10:26:32  (Reading database ... 45%
+10:26:32  (Reading database ... 50%
+10:26:32  (Reading database ... 55%
+10:26:32  (Reading database ... 60%
+10:26:32  (Reading database ... 65%
+10:26:32  (Reading database ... 70%
+10:26:32  (Reading database ... 75%
+10:26:32  (Reading database ... 80%
+10:26:32  (Reading database ... 85%
+10:26:32  (Reading database ... 90%
+10:26:32  (Reading database ... 95%
+10:26:32  (Reading database ... 100%
+10:26:32  (Reading database ... 6096 files and directories currently installed.)
+10:26:32  Preparing to unpack .../perl-base_5.36.0-7+deb12u4_amd64.deb ...
+10:26:32  Unpacking perl-base (5.36.0-7+deb12u4) over (5.36.0-7+deb12u3) ...
+10:26:35  Setting up perl-base (5.36.0-7+deb12u4) ...
+10:26:35  Selecting previously unselected package perl-modules-5.36.
+10:26:35  (Reading database ...
+10:26:35  (Reading database ... 5%
+10:26:35  (Reading database ... 10%
+10:26:35  (Reading database ... 15%
+10:26:35  (Reading database ... 20%
+10:26:35  (Reading database ... 25%
+10:26:35  (Reading database ... 30%
+10:26:35  (Reading database ... 35%
+10:26:35  (Reading database ... 40%
+10:26:35  (Reading database ... 45%
+10:26:35  (Reading database ... 50%
+10:26:35  (Reading database ... 55%
+10:26:35  (Reading database ... 60%
+10:26:35  (Reading database ... 65%
+10:26:35  (Reading database ... 70%
+10:26:35  (Reading database ... 75%
+10:26:35  (Reading database ... 80%
+10:26:35  (Reading database ... 85%
+10:26:35  (Reading database ... 90%
+10:26:35  (Reading database ... 95%
+10:26:35  (Reading database ... 100%
+10:26:35  (Reading database ... 6096 files and directories currently installed.)
+10:26:35  Preparing to unpack .../00-perl-modules-5.36_5.36.0-7+deb12u4_all.deb ...
+10:26:35  Unpacking perl-modules-5.36 (5.36.0-7+deb12u4) ...
+10:26:35  Selecting previously unselected package libgdbm6:amd64.
+10:26:35  Preparing to unpack .../01-libgdbm6_1.23-3_amd64.deb ...
+10:26:35  Unpacking libgdbm6:amd64 (1.23-3) ...
+10:26:35  Selecting previously unselected package libgdbm-compat4:amd64.
+10:26:35  Preparing to unpack .../02-libgdbm-compat4_1.23-3_amd64.deb ...
+10:26:35  Unpacking libgdbm-compat4:amd64 (1.23-3) ...
+10:26:35  Selecting previously unselected package libperl5.36:amd64.
+10:26:35  Preparing to unpack .../03-libperl5.36_5.36.0-7+deb12u4_amd64.deb ...
+10:26:35  Unpacking libperl5.36:amd64 (5.36.0-7+deb12u4) ...
+10:26:36  Selecting previously unselected package perl.
+10:26:36  Preparing to unpack .../04-perl_5.36.0-7+deb12u4_amd64.deb ...
+10:26:36  Unpacking perl (5.36.0-7+deb12u4) ...
+10:26:36  Selecting previously unselected package libbrotli1:amd64.
+10:26:36  Preparing to unpack .../05-libbrotli1_1.0.9-2+b6_amd64.deb ...
+10:26:36  Unpacking libbrotli1:amd64 (1.0.9-2+b6) ...
+10:26:36  Selecting previously unselected package libkrb5support0:amd64.
+10:26:36  Preparing to unpack .../06-libkrb5support0_1.20.1-2+deb12u5_amd64.deb ...
+10:26:36  Unpacking libkrb5support0:amd64 (1.20.1-2+deb12u5) ...
+10:26:36  Selecting previously unselected package libk5crypto3:amd64.
+10:26:36  Preparing to unpack .../07-libk5crypto3_1.20.1-2+deb12u5_amd64.deb ...
+10:26:36  Unpacking libk5crypto3:amd64 (1.20.1-2+deb12u5) ...
+10:26:36  Selecting previously unselected package libkeyutils1:amd64.
+10:26:36  Preparing to unpack .../08-libkeyutils1_1.6.3-2_amd64.deb ...
+10:26:36  Unpacking libkeyutils1:amd64 (1.6.3-2) ...
+10:26:36  Selecting previously unselected package libssl3:amd64.
+10:26:36  Preparing to unpack .../09-libssl3_3.0.22-1~deb12u1_amd64.deb ...
+10:26:36  Unpacking libssl3:amd64 (3.0.22-1~deb12u1) ...
+10:26:36  Selecting previously unselected package libkrb5-3:amd64.
+10:26:36  Preparing to unpack .../10-libkrb5-3_1.20.1-2+deb12u5_amd64.deb ...
+10:26:36  Unpacking libkrb5-3:amd64 (1.20.1-2+deb12u5) ...
+10:26:37  Selecting previously unselected package libgssapi-krb5-2:amd64.
+10:26:37  Preparing to unpack .../11-libgssapi-krb5-2_1.20.1-2+deb12u5_amd64.deb ...
+10:26:37  Unpacking libgssapi-krb5-2:amd64 (1.20.1-2+deb12u5) ...
+10:26:37  Selecting previously unselected package libsasl2-modules-db:amd64.
+10:26:37  Preparing to unpack .../12-libsasl2-modules-db_2.1.28+dfsg-10_amd64.deb ...
+10:26:37  Unpacking libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+10:26:37  Selecting previously unselected package libsasl2-2:amd64.
+10:26:37  Preparing to unpack .../13-libsasl2-2_2.1.28+dfsg-10_amd64.deb ...
+10:26:37  Unpacking libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+10:26:37  Selecting previously unselected package libldap-2.5-0:amd64.
+10:26:37  Preparing to unpack .../14-libldap-2.5-0_2.5.13+dfsg-5_amd64.deb ...
+10:26:37  Unpacking libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+10:26:37  Selecting previously unselected package libnghttp2-14:amd64.
+10:26:37  Preparing to unpack .../15-libnghttp2-14_1.52.0-1+deb12u3_amd64.deb ...
+10:26:37  Unpacking libnghttp2-14:amd64 (1.52.0-1+deb12u3) ...
+10:26:37  Selecting previously unselected package libpsl5:amd64.
+10:26:37  Preparing to unpack .../16-libpsl5_0.21.2-1_amd64.deb ...
+10:26:37  Unpacking libpsl5:amd64 (0.21.2-1) ...
+10:26:37  Selecting previously unselected package librtmp1:amd64.
+10:26:37  Preparing to unpack .../17-librtmp1_2.4+20151223.gitfa8646d.1-2+b2_amd64.deb ...
+10:26:37  Unpacking librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+10:26:37  Selecting previously unselected package libssh2-1:amd64.
+10:26:37  Preparing to unpack .../18-libssh2-1_1.10.0-3+deb12u1_amd64.deb ...
+10:26:37  Unpacking libssh2-1:amd64 (1.10.0-3+deb12u1) ...
+10:26:37  Selecting previously unselected package libcurl3-gnutls:amd64.
+10:26:37  Preparing to unpack .../19-libcurl3-gnutls_7.88.1-10+deb12u15_amd64.deb ...
+10:26:37  Unpacking libcurl3-gnutls:amd64 (7.88.1-10+deb12u15) ...
+10:26:37  Selecting previously unselected package libexpat1:amd64.
+10:26:37  Preparing to unpack .../20-libexpat1_2.5.0-1+deb12u4_amd64.deb ...
+10:26:37  Unpacking libexpat1:amd64 (2.5.0-1+deb12u4) ...
+10:26:37  Selecting previously unselected package liberror-perl.
+10:26:37  Preparing to unpack .../21-liberror-perl_0.17029-2_all.deb ...
+10:26:37  Unpacking liberror-perl (0.17029-2) ...
+10:26:37  Selecting previously unselected package git-man.
+10:26:37  Preparing to unpack .../22-git-man_1%3a2.39.5-0+deb12u3_all.deb ...
+10:26:37  Unpacking git-man (1:2.39.5-0+deb12u3) ...
+10:26:37  Selecting previously unselected package git.
+10:26:37  Preparing to unpack .../23-git_1%3a2.39.5-0+deb12u3_amd64.deb ...
+10:26:37  Unpacking git (1:2.39.5-0+deb12u3) ...
+10:26:38  Setting up libexpat1:amd64 (2.5.0-1+deb12u4) ...
+10:26:38  Setting up libkeyutils1:amd64 (1.6.3-2) ...
+10:26:38  Setting up libpsl5:amd64 (0.21.2-1) ...
+10:26:38  Setting up libbrotli1:amd64 (1.0.9-2+b6) ...
+10:26:38  Setting up libssl3:amd64 (3.0.22-1~deb12u1) ...
+10:26:38  Setting up libnghttp2-14:amd64 (1.52.0-1+deb12u3) ...
+10:26:38  Setting up libkrb5support0:amd64 (1.20.1-2+deb12u5) ...
+10:26:38  Setting up libsasl2-modules-db:amd64 (2.1.28+dfsg-10) ...
+10:26:38  Setting up perl-modules-5.36 (5.36.0-7+deb12u4) ...
+10:26:38  Setting up librtmp1:amd64 (2.4+20151223.gitfa8646d.1-2+b2) ...
+10:26:38  Setting up libk5crypto3:amd64 (1.20.1-2+deb12u5) ...
+10:26:38  Setting up libsasl2-2:amd64 (2.1.28+dfsg-10) ...
+10:26:38  Setting up git-man (1:2.39.5-0+deb12u3) ...
+10:26:38  Setting up libssh2-1:amd64 (1.10.0-3+deb12u1) ...
+10:26:38  Setting up libkrb5-3:amd64 (1.20.1-2+deb12u5) ...
+10:26:38  Setting up libgdbm6:amd64 (1.23-3) ...
+10:26:38  Setting up libldap-2.5-0:amd64 (2.5.13+dfsg-5) ...
+10:26:38  Setting up libgssapi-krb5-2:amd64 (1.20.1-2+deb12u5) ...
+10:26:38  Setting up libgdbm-compat4:amd64 (1.23-3) ...
+10:26:38  Setting up libperl5.36:amd64 (5.36.0-7+deb12u4) ...
+10:26:38  Setting up libcurl3-gnutls:amd64 (7.88.1-10+deb12u15) ...
+10:26:38  Setting up perl (5.36.0-7+deb12u4) ...
+10:26:38  Setting up liberror-perl (0.17029-2) ...
+10:26:38  Setting up git (1:2.39.5-0+deb12u3) ...
+10:26:38  Processing triggers for libc-bin (2.36-9+deb12u14) ...
+10:26:38  + rm -rf /var/lib/apt/lists/auxfiles /var/lib/apt/lists/deb.debian.org_debian-security_dists_bookworm-security_InRelease /var/lib/apt/lists/deb.debian.org_debian-security_dists_bookworm-security_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/deb.debian.org_debian_dists_bookworm-updates_InRelease /var/lib/apt/lists/deb.debian.org_debian_dists_bookworm-updates_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/deb.debian.org_debian_dists_bookworm_InRelease /var/lib/apt/lists/deb.debian.org_debian_dists_bookworm_main_binary-amd64_Packages.lz4 /var/lib/apt/lists/lock /var/lib/apt/lists/partial
+10:26:38  + git config --global --add safe.directory /var/jenkins_home/workspace/kijanikiosk-ci
+[Pipeline] script
+[Pipeline] {
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] sh
+10:26:39  + set -eu
+10:26:39  + npm ci
+10:26:40
+10:26:40  up to date, audited 1 package in 775ms
+10:26:40
+10:26:40  found 0 vulnerabilities
+10:26:40  + npm run lint
+10:26:40
+10:26:40  > kijanikiosk-payments@1.0.0 lint
+10:26:40  > node --check src/index.js && node --check test/payments.test.js
+10:26:40
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Build)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+10:26:41  + git rev-parse --short=7 HEAD
+10:26:41  + GIT_SHA=3be657f
+10:26:41  + node -p require('./package.json').version
+10:26:41  + BASE_VERSION=1.0.0
+10:26:41  + printf %s-%s 1.0.0 3be657f
+[Pipeline] writeFile
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] sh
+10:26:41  + set -eu
+10:26:41  + cat .package-version
+10:26:41  + PACKAGE_VERSION=1.0.0-3be657f
+10:26:41  + echo Building package: kijanikiosk-payments@1.0.0-3be657f
+10:26:41  Building package: kijanikiosk-payments@1.0.0-3be657f
+10:26:41  + npm version 1.0.0-3be657f --no-git-tag-version
+10:26:41  v1.0.0-3be657f
+10:26:41  + npm ci
+10:26:42
+10:26:42  up to date, audited 1 package in 372ms
+10:26:42
+10:26:42  found 0 vulnerabilities
+10:26:42  + npm run build
+10:26:42
+10:26:42  > kijanikiosk-payments@1.0.0-3be657f build
+10:26:42  > mkdir -p dist && cp src/index.js dist/index.js
+10:26:42
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Verify)
+[Pipeline] parallel
+[Pipeline] { (Branch: Test)
+[Pipeline] { (Branch: Security Audit)
+[Pipeline] stage
+[Pipeline] { (Test)
+[Pipeline] stage
+[Pipeline] { (Security Audit)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] sh
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] sh
+10:26:43  + set -eu
+10:26:43  + npm audit --omit=dev
+10:26:43  + set -eu
+10:26:43  + mkdir -p reports
+10:26:43  + npm test -- --test-reporter=junit --test-reporter-destination=reports/junit.xml
+10:26:43
+10:26:43  > kijanikiosk-payments@1.0.0-3be657f test
+10:26:43  > node --test --test-reporter=junit --test-reporter-destination=reports/junit.xml
+10:26:43
+10:26:43  found 0 vulnerabilities
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // parallel
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Archive)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] sh
+10:26:44  + set -eu
+10:26:44  + cat .package-version
+10:26:44  + PACKAGE_VERSION=1.0.0-3be657f
+10:26:44  + mkdir -p dist
+10:26:44  + npm pack --pack-destination dist
+10:26:44  npm notice
+10:26:44  npm notice package: kijanikiosk-payments@1.0.0-3be657f
+10:26:44  npm notice Tarball Contents
+10:26:44  npm notice 797B dist/index.js
+10:26:44  npm notice 490B package.json
+10:26:44  npm notice Tarball Details
+10:26:44  npm notice name: kijanikiosk-payments
+10:26:44  npm notice version: 1.0.0-3be657f
+10:26:44  npm notice filename: kijanikiosk-payments-1.0.0-3be657f.tgz
+10:26:44  npm notice package size: 710 B
+10:26:44  npm notice unpacked size: 1.3 kB
+10:26:44  npm notice shasum: 06f07e09c1c60e91253042cd989f9edfe4e52dd9
+10:26:44  npm notice integrity: sha512-gsCOtVkoF45Kq[...]jMTbcdWERs77g==
+10:26:44  npm notice total files: 2
+10:26:44  npm notice
+10:26:44  kijanikiosk-payments-1.0.0-3be657f.tgz
+10:26:44  + echo Created package artifact for version 1.0.0-3be657f
+10:26:44  Created package artifact for version 1.0.0-3be657f
+[Pipeline] archiveArtifacts
+10:26:45  Archiving artifacts
+10:26:45  Recording fingerprints
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Publish)
+[Pipeline] script
+[Pipeline] {
+[Pipeline] }
+[Pipeline] // script
+[Pipeline] withCredentials
+10:26:45  Masking supported pattern matches of $NEXUS_PASSWORD
+[Pipeline] {
+[Pipeline] sh
+10:26:45  + set -eu
+10:26:45  + cat .package-version
+10:26:45  + PACKAGE_VERSION=1.0.0-3be657f
+10:26:45  + printf %s jenkins-publisher:****
+10:26:45  + base64
+10:26:45  + tr -d \n
+10:26:45  + AUTH=amVua2lucy1wdWJsaXNoZXI6****
+10:26:45  + trap rm -f .npmrc EXIT
+10:26:45  + printf %s http://nexus:8081/repository/kijanikiosk-npm/
+10:26:45  + sed -E s#^https?://##; s#/$##
+10:26:45  + NEXUS_HOST_PATH=nexus:8081/repository/kijanikiosk-npm
+10:26:45  + printf %s\n registry=http://nexus:8081/repository/kijanikiosk-npm/ //nexus:8081/repository/kijanikiosk-npm/:_auth=amVua2lucy1wdWJsaXNoZXI6**** always-auth=true
+10:26:45  + echo Publishing with Jenkins-managed credentials (secret values are not logged).
+10:26:45  Publishing with Jenkins-managed credentials (secret values are not logged).
+10:26:45  + npm publish ./dist/kijanikiosk-payments-1.0.0-3be657f.tgz --registry=http://nexus:8081/repository/kijanikiosk-npm/
+10:26:46  npm notice
+10:26:46  npm notice package: kijanikiosk-payments@1.0.0-3be657f
+10:26:46  npm notice Tarball Contents
+10:26:46  npm notice 797B dist/index.js
+10:26:46  npm notice 490B package.json
+10:26:46  npm notice Tarball Details
+10:26:46  npm notice name: kijanikiosk-payments
+10:26:46  npm notice version: 1.0.0-3be657f
+10:26:46  npm notice filename: kijanikiosk-payments-1.0.0-3be657f.tgz
+10:26:46  npm notice package size: 710 B
+10:26:46  npm notice unpacked size: 1.3 kB
+10:26:46  npm notice shasum: 06f07e09c1c60e91253042cd989f9edfe4e52dd9
+10:26:46  npm notice integrity: sha512-gsCOtVkoF45Kq[...]jMTbcdWERs77g==
+10:26:46  npm notice total files: 2
+10:26:46  npm notice
+10:26:46  npm notice Publishing to http://nexus:8081/repository/kijanikiosk-npm/ with tag latest and default access
+10:26:46  + kijanikiosk-payments@1.0.0-3be657f
+10:26:46  + echo Published kijanikiosk-payments@1.0.0-3be657f
+10:26:46  Published kijanikiosk-payments@1.0.0-3be657f
+10:26:46  + rm -f .npmrc
+[Pipeline] }
+[Pipeline] // withCredentials
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] stage
+[Pipeline] { (Declarative: Post Actions)
+[Pipeline] junit
+10:26:47  Recording test results
+10:26:47  [Checks API] No suitable checks publisher found.
+[Pipeline] echo
+10:26:47  CI pipeline finished. Review the stage results above.
+[Pipeline] sh
+10:26:47  + chown -R 1000:1000 /var/jenkins_home/workspace/kijanikiosk-ci
+[Pipeline] cleanWs
+10:26:47  [WS-CLEANUP] Deleting project workspace...
+10:26:47  [WS-CLEANUP] Deferred wipeout is used...
+10:26:47  [WS-CLEANUP] done
+[Pipeline] echo
+10:26:47  The pipeline build result changed from the previous build.
+[Pipeline] echo
+10:26:47  CI pipeline completed successfully.
+[Pipeline] echo
+10:26:47  Package: kijanikiosk-payments@1.0.0-3be657f
+[Pipeline] echo
+10:26:47  Artifact URL: http://nexus:8081/repository/kijanikiosk-npm/kijanikiosk-payments/-/kijanikiosk-payments-1.0.0-3be657f.tgz
+[Pipeline] }
+[Pipeline] // stage
+[Pipeline] }
+[Pipeline] // timeout
+[Pipeline] }
+[Pipeline] // timestamps
+[Pipeline] }
+[Pipeline] // withEnv
+[Pipeline] }
+$ docker stop --time=1 59fcf35908ee65e00fb6fb9b14c985eb1969bfd6bd49103570df3f67bc2aa272
+$ docker rm -f --volumes 59fcf35908ee65e00fb6fb9b14c985eb1969bfd6bd49103570df3f67bc2aa272
+[Pipeline] // withDockerContainer
+[Pipeline] }
+[Pipeline] // node
+[Pipeline] End of Pipeline
+Finished: SUCCESS
