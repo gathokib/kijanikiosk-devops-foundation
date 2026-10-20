@@ -1,3 +1,4 @@
+
 pipeline {
     agent {
         docker {
@@ -17,7 +18,7 @@ pipeline {
         choice(
             name: 'FAIL_STAGE',
             choices: ['None', 'Lint', 'Build', 'Verify', 'Archive', 'Publish'],
-            description: 'Select a stage for controlled failure testing.'
+            description: 'Select a stage to intentionally fail for testing'
         )
     }
 
@@ -32,24 +33,26 @@ pipeline {
         stage('Lint') {
             steps {
                 checkout scm
-                sh 'apt-get update && apt-get install -y --no-install-recommends git'
-                sh 'git config --global --add safe.directory "$WORKSPACE"'
+
+                sh '''
+                    set -eu
+                    apt-get update
+                    apt-get install -y --no-install-recommends git
+                    rm -rf /var/lib/apt/lists/*
+                    git config --global --add safe.directory "$WORKSPACE"
+                '''
+
                 script {
-                    env.GIT_SHA = sh(
-                        script: 'git rev-parse --short=7 HEAD',
-                        returnStdout: true
-                    ).trim()
-
-                    env.PACKAGE_VERSION = sh(
-                        script: "node -p \"require('./package.json').version\"",
-                        returnStdout: true
-                    ).trim() + "-${env.GIT_SHA}"
-
                     if (params.FAIL_STAGE == 'Lint') {
                         error('Injected failure: Lint')
                     }
                 }
-                sh 'npm ci && npm run lint'
+
+                sh '''
+                    set -eu
+                    npm ci
+                    npm run lint
+                '''
             }
         }
 
@@ -59,8 +62,20 @@ pipeline {
                     if (params.FAIL_STAGE == 'Build') {
                         error('Injected failure: Build')
                     }
+
+                    env.GIT_SHA = sh(
+                        script: 'git rev-parse --short=7 HEAD',
+                        returnStdout: true
+                    ).trim()
+
+                    env.PACKAGE_VERSION = sh(
+                        script: "node -p \"require('./package.json').version\"",
+                        returnStdout: true
+                    ).trim() + "-${env.GIT_SHA}"
                 }
+
                 sh '''
+                    set -eu
                     npm version "$PACKAGE_VERSION" --no-git-tag-version
                     npm ci
                     npm run build
@@ -77,17 +92,21 @@ pipeline {
                                 error('Injected failure: Verify')
                             }
                         }
+
                         sh '''
+                            set -eu
                             mkdir -p reports
-                            npm test -- --test-reporter=junit \
-                              --test-reporter-destination=reports/junit.xml
+                            npm test -- --test-reporter=junit --test-reporter-destination=reports/junit.xml
                         '''
                     }
                 }
 
                 stage('Security Audit') {
                     steps {
-                        sh 'npm audit --omit=dev'
+                        sh '''
+                            set -eu
+                            npm audit --omit=dev
+                        '''
                     }
                 }
             }
@@ -100,7 +119,13 @@ pipeline {
                         error('Injected failure: Archive')
                     }
                 }
-                sh 'npm pack --pack-destination dist'
+
+                sh '''
+                    set -eu
+                    mkdir -p dist
+                    npm pack --pack-destination dist
+                '''
+
                 archiveArtifacts(
                     artifacts: 'dist/**,reports/junit.xml,package.json,package-lock.json',
                     fingerprint: true
@@ -125,17 +150,21 @@ pipeline {
                 ]) {
                     sh '''
                         set -eu
+
                         AUTH=$(printf '%s' "$NEXUS_USER:$NEXUS_PASSWORD" | base64 | tr -d '\\n')
 
                         trap 'rm -f .npmrc' EXIT
+
                         printf '%s\\n' \
-                          "registry=$NEXUS_REGISTRY" \
-                          "//nexus:8081/repository/kijanikiosk-npm/:_auth=$AUTH" \
-                          "//nexus:8081/repository/kijanikiosk-npm/:always-auth=true" \
-                          > .npmrc
+                            "registry=$NEXUS_REGISTRY" \
+                            "//$(
+                                printf '%s' "$NEXUS_REGISTRY" |
+                                sed -E 's#^https?://##; s#/$##'
+                            )/:_auth=$AUTH" \
+                            "always-auth=true" > .npmrc
 
                         npm publish "dist/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" \
-                          --registry="$NEXUS_REGISTRY"
+                            --registry="$NEXUS_REGISTRY"
                     '''
                 }
             }
@@ -144,22 +173,26 @@ pipeline {
 
     post {
         always {
-            junit allowEmptyResults: true, testResults: 'reports/junit.xml'
-            echo 'Pipeline finished; test results have been collected when available.'
+            junit(
+                allowEmptyResults: true,
+                testResults: 'reports/junit.xml'
+            )
+
+            echo 'CI pipeline finished. Check the stages above for results.'
             deleteDir()
         }
 
         success {
-            echo "SUCCESS: Published $PACKAGE_NAME@$PACKAGE_VERSION"
-            echo "Artifact URL: ${NEXUS_REGISTRY}${PACKAGE_NAME}/-/${PACKAGE_NAME}-${PACKAGE_VERSION}.tgz"
+            echo "Successfully published ${PACKAGE_NAME}@${PACKAGE_VERSION}."
+            echo "Artifact repository: ${NEXUS_REGISTRY}"
         }
 
         failure {
-            echo "FAILURE NOTIFICATION: ${env.JOB_NAME} #${env.BUILD_NUMBER} failed. Check the stage logs."
+            echo 'CI pipeline failed. Review the first failing stage and its console output.'
         }
 
         changed {
-            echo "STATUS TRANSITION NOTIFICATION: ${env.JOB_NAME} changed its overall build status."
+            echo 'The pipeline build result changed from the previous build.'
         }
     }
 }
