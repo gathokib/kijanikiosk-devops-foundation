@@ -24,7 +24,6 @@ pipeline {
     environment {
         NEXUS_REGISTRY = 'http://nexus:8081/repository/kijanikiosk-npm/'
         PACKAGE_NAME = 'kijanikiosk-payments'
-        PACKAGE_VERSION = ''
     }
 
     stages {
@@ -62,16 +61,23 @@ pipeline {
                     }
 
                     env.PACKAGE_VERSION = sh(
-                        script: '''GIT_SHA=$(git rev-parse --short=7 HEAD)
-BASE_VERSION=$(node -p "require('./package.json').version")
-printf '%s-%s' "$BASE_VERSION" "$GIT_SHA"''',
+                        script: '''
+                            GIT_SHA=$(git rev-parse --short=7 HEAD)
+                            BASE_VERSION=$(node -p "require('./package.json').version")
+                            printf '%s-%s' "$BASE_VERSION" "$GIT_SHA"
+                        ''',
                         returnStdout: true
                     ).trim()
+
+                    writeFile(
+                        file: '.package-version',
+                        text: "${env.PACKAGE_VERSION}\n"
+                    )
                 }
 
                 sh '''
                     set -eu
-                    printf '%s\\n' "$PACKAGE_VERSION" > .package-version
+                    PACKAGE_VERSION=$(cat .package-version)
 
                     echo "Building package: $PACKAGE_NAME@$PACKAGE_VERSION"
 
