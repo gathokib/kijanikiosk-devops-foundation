@@ -1,0 +1,19 @@
+{
+  "name": "kijanikiosk-payments",
+  "version": "1.0.0",
+  "description": "KijaniKiosk payments service CI demonstration",
+  "main": "dist/index.js",
+  "scripts": {
+    "lint": "node --check src/index.js && node --check test/payments.test.js",
+    "test": "node --test",
+    "build": "mkdir -p dist && cp src/index.js dist/index.js",
+    "security-audit": "npm audit --omit=dev"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "license": "UNLICENSED",
+  "files": [
+    "dist/"
+  ]
+}
