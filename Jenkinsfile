@@ -2,7 +2,7 @@ pipeline {
     agent {
         docker {
             image 'node:22-bookworm-slim'
-            args '-u root:root'
+            args '--network ci_default -u root:root'
             alwaysPull false
         }
     }
