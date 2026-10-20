@@ -1,4 +1,3 @@
-
 pipeline {
     agent {
         docker {
@@ -163,7 +162,9 @@ pipeline {
                             "//$NEXUS_HOST_PATH/:_auth=$AUTH" \
                             "always-auth=true" > .npmrc
 
-                        npm publish "dist/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" \
+                        # The leading ./ is required: without it npm treats
+                        # "dist/<file>.tgz" as a GitHub user/repo shorthand.
+                        npm publish "./dist/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" \
                             --registry="$NEXUS_REGISTRY"
 
                         echo "Published $PACKAGE_NAME@$PACKAGE_VERSION"
@@ -181,6 +182,10 @@ pipeline {
             )
 
             echo 'CI pipeline finished. Check the stages above for results.'
+
+            // Container runs as root, so hand files back to the Jenkins user
+            // (uid 1000) before deleteDir() runs as a non-root process.
+            sh 'chown -R 1000:1000 "$WORKSPACE" || true'
             deleteDir()
         }
 
