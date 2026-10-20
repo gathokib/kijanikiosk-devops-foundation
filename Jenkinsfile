@@ -10,7 +10,7 @@ pipeline {
 
     options {
         timestamps()
-        timeout(time: 10, unit: 'MINUTES')
+        timeout(time: 15, unit: 'MINUTES')
         skipDefaultCheckout(true)
     }
 
@@ -25,8 +25,6 @@ pipeline {
     environment {
         NEXUS_REGISTRY = 'http://nexus:8081/repository/kijanikiosk-npm/'
         PACKAGE_NAME = 'kijanikiosk-payments'
-        PACKAGE_VERSION = ''
-        GIT_SHA = ''
     }
 
     stages {
@@ -62,20 +60,19 @@ pipeline {
                     if (params.FAIL_STAGE == 'Build') {
                         error('Injected failure: Build')
                     }
-
-                    env.GIT_SHA = sh(
-                        script: 'git rev-parse --short=7 HEAD',
-                        returnStdout: true
-                    ).trim()
-
-                    env.PACKAGE_VERSION = sh(
-                        script: "node -p \"require('./package.json').version\"",
-                        returnStdout: true
-                    ).trim() + "-${env.GIT_SHA}"
                 }
 
                 sh '''
                     set -eu
+
+                    GIT_SHA=$(git rev-parse --short=7 HEAD)
+                    BASE_VERSION=$(node -p "require('./package.json').version")
+                    PACKAGE_VERSION="${BASE_VERSION}-${GIT_SHA}"
+
+                    printf '%s\\n' "$PACKAGE_VERSION" > .package-version
+
+                    echo "Building package: $PACKAGE_NAME@$PACKAGE_VERSION"
+
                     npm version "$PACKAGE_VERSION" --no-git-tag-version
                     npm ci
                     npm run build
@@ -122,12 +119,14 @@ pipeline {
 
                 sh '''
                     set -eu
+                    PACKAGE_VERSION=$(cat .package-version)
                     mkdir -p dist
                     npm pack --pack-destination dist
+                    echo "Created package artifact for version $PACKAGE_VERSION"
                 '''
 
                 archiveArtifacts(
-                    artifacts: 'dist/**,reports/junit.xml,package.json,package-lock.json',
+                    artifacts: 'dist/**,reports/junit.xml,package.json,package-lock.json,.package-version',
                     fingerprint: true
                 )
             }
@@ -151,20 +150,23 @@ pipeline {
                     sh '''
                         set -eu
 
+                        PACKAGE_VERSION=$(cat .package-version)
                         AUTH=$(printf '%s' "$NEXUS_USER:$NEXUS_PASSWORD" | base64 | tr -d '\\n')
 
                         trap 'rm -f .npmrc' EXIT
 
+                        NEXUS_HOST_PATH=$(printf '%s' "$NEXUS_REGISTRY" |
+                            sed -E 's#^https?://##; s#/$##')
+
                         printf '%s\\n' \
                             "registry=$NEXUS_REGISTRY" \
-                            "//$(
-                                printf '%s' "$NEXUS_REGISTRY" |
-                                sed -E 's#^https?://##; s#/$##'
-                            )/:_auth=$AUTH" \
+                            "//$NEXUS_HOST_PATH/:_auth=$AUTH" \
                             "always-auth=true" > .npmrc
 
                         npm publish "dist/$PACKAGE_NAME-$PACKAGE_VERSION.tgz" \
                             --registry="$NEXUS_REGISTRY"
+
+                        echo "Published $PACKAGE_NAME@$PACKAGE_VERSION"
                     '''
                 }
             }
@@ -183,8 +185,9 @@ pipeline {
         }
 
         success {
-            echo "Successfully published ${PACKAGE_NAME}@${PACKAGE_VERSION}."
-            echo "Artifact repository: ${NEXUS_REGISTRY}"
+            echo 'CI pipeline completed successfully.'
+            echo "Package: ${env.PACKAGE_NAME}"
+            echo "Registry: ${env.NEXUS_REGISTRY}"
         }
 
         failure {
