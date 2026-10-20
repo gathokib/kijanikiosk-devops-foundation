@@ -33,6 +33,7 @@ pipeline {
             steps {
                 checkout scm
                 sh 'apt-get update && apt-get install -y --no-install-recommends git'
+                sh 'git config --global --add safe.directory "$WORKSPACE"'
                 script {
                     env.GIT_SHA = sh(
                         script: 'git rev-parse --short=7 HEAD',
