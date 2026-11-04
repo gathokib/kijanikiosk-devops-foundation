@@ -18,7 +18,7 @@ spec:
         - name: kijani-registry-credentials
       containers:
         - name: payments
-          image: localhost:5000/kk-payments:1.0.0-4fff20d
+          image: localhost:5000/kk-payments:1.0.0-1e541ed
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 3000
