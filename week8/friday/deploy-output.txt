@@ -1,0 +1,18 @@
+KijaniKiosk Kubernetes deployment evidence
+Environment: Killercoda Kubernetes playground, node controlplane.
+
+Deployment:
+deployment.apps/kk-payments created
+Desired replicas: 2
+
+Pods observed after deployment:
+NAME                           READY   STATUS    RESTARTS   IP
+kk-payments-77dbfb744b-5f54f   1/1     Running   0          192.168.0.186
+kk-payments-77dbfb744b-cwgdn   1/1     Running   0          192.168.0.140
+
+After the self-healing test, final Pods:
+kk-payments-77dbfb744b-cwgdn   1/1     Running   0          192.168.0.140
+kk-payments-77dbfb744b-d257z   1/1     Running   0          192.168.0.214
+
+Playground image-access note:
+The application image was rebuilt inside Killercoda, then imported into the Kubernetes containerd image store. The playground Deployment used the local image reference and imagePullPolicy Never, with the registry Secret reference omitted for that isolated test. The committed Deployment manifest retains the required private-registry image reference and Secret name. The playground did not validate access to the laptop's private registry.
