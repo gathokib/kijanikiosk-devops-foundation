@@ -1,0 +1,26 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY src/ ./src/
+RUN npm run build
+
+FROM node:22-alpine AS production
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+RUN addgroup -S kijani && adduser -S kijani -G kijani
+
+WORKDIR /app
+COPY --from=build --chown=kijani:kijani /app/dist ./dist
+
+USER kijani
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health || exit 1
+
+CMD ["node", "dist/index.js"]
