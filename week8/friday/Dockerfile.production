@@ -1,0 +1,35 @@
+FROM node:22-alpine AS build
+
+WORKDIR /app
+COPY package*.json ./
+RUN npm ci
+COPY src/ ./src/
+RUN npm run build
+
+RUN apk add --no-cache binutils upx \
+    && cp /usr/local/bin/node /tmp/node \
+    && strip --strip-unneeded /tmp/node \
+    && upx -9 /tmp/node \
+    && upx -t /tmp/node
+
+FROM alpine:3.24.3 AS production
+
+ENV NODE_ENV=production
+ENV PORT=3000
+
+RUN apk add --no-cache libstdc++ libgcc \
+    && addgroup -S kijani \
+    && adduser -S kijani -G kijani
+
+COPY --from=build /tmp/node /usr/local/bin/node
+
+WORKDIR /app
+COPY --from=build --chown=kijani:kijani /app/dist ./dist
+
+USER kijani
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=3s --start-period=30s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:3000/health || exit 1
+
+CMD ["/usr/local/bin/node", "dist/index.js"]
