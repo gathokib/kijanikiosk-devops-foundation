@@ -1,0 +1,20 @@
+KijaniKiosk private registry push and fresh-pull evidence
+Date: 2026-11-04
+
+Version: 1.0.0
+Git short SHA used for tag: 4fff20d
+Tag: 1.0.0-4fff20d
+Registry reference: localhost:5000/kk-payments:1.0.0-4fff20d
+
+Push result:
+1.0.0-4fff20d: digest: sha256:cdd4aeacfc7b89f17c358393395dcbc3cbb79f570622238e4fd3a3497755defd size: 856
+
+Fresh-pull verification:
+Removed the local registry-tagged image, then ran:
+docker pull localhost:5000/kk-payments:1.0.0-4fff20d
+
+Result:
+Digest: sha256:cdd4aeacfc7b89f17c358393395dcbc3cbb79f570622238e4fd3a3497755defd
+Status: Downloaded newer image for localhost:5000/kk-payments:1.0.0-4fff20d
+
+No registry credentials were committed to the repository.
