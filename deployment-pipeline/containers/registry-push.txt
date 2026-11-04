@@ -1,0 +1,15 @@
+The push refers to repository [localhost:5000/kijanikiosk-payments]
+8776aa3d2ba7: Waiting
+44136fa355b3: Waiting
+31848ae4e509: Waiting
+7b229517ed22: Waiting
+304511616d6a: Layer already exists
+0e79bb10b90a: Layer already exists
+7b0e8a8055a1: Layer already exists
+e33340bf5739: Layer already exists
+44136fa355b3: Already exists
+31848ae4e509: Already exists
+7b229517ed22: Layer already exists
+8776aa3d2ba7: Layer already exists
+7246d4c6a55d: Layer already exists
+1.0.0-db3550b: digest: sha256:e65293f2f88750a4aed8c2b3895c995fb61a2ec0713c4a924a246b9956f8bb2e size: 856

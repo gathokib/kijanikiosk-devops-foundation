@@ -1,0 +1,4 @@
+ci/.env
+node_modules/
+dist/
+*.tgz

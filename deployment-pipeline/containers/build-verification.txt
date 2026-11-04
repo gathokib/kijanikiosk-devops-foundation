@@ -1,0 +1,30 @@
+KijaniKiosk Production Container Verification
+Date: 2026-11-04
+
+Build:
+docker build --no-cache -f deployment-pipeline/containers/Dockerfile.production -t kijanikiosk-payments:production .
+
+Runtime user:
+kijani
+
+TypeScript compiler:
+tsc not installed in production image.
+
+Health check:
+Container started on host port 3002.
+Waited 35 seconds.
+Docker health status: healthy
+
+Health endpoint:
+GET http://localhost:3002/health
+Response:
+{"status":"healthy","service":"kijanikiosk-payments","version":"1.0.0"}
+
+Image size:
+Docker content size: 61.4MB
+Docker disk usage: 239MB
+Image inspect size: 239120337 bytes
+
+Note:
+The content size is below 100MB, but the unpacked disk usage is 239MB.
+Both figures are recorded transparently.
