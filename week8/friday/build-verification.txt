@@ -1,32 +1,24 @@
-KijaniKiosk Week 8 production image verification
-Date: 2026-11-04
+WEEK 8 PRODUCTION BUILD VERIFICATION
+Date: 2026-11-04T20:39:59+03:00
 
-Ubuntu laptop clean build:
-Command: docker build --no-cache -f deployment-pipeline/containers/Dockerfile.production -t kk-payments:week8 .
-Result: build completed successfully.
-Image ID: cdd4aeacfc7b
-Docker-reported image size: 239 MB
-Docker-reported content size: 61.4 MB
-Image inspect size: 239120337 bytes
+Build command:
+docker build --no-cache -f week8/friday/Dockerfile.production -t kk-payments:week8 .
+
+Image size:
+97258010 bytes
+
+Node version:
+v22.23.4
 
 Runtime user:
-docker run --rm kk-payments:week8 whoami
-Output: kijani
+kijani
 
 TypeScript compiler:
-docker run --rm kk-payments:week8 which tsc
-Output: no path returned; compiler is absent from production image.
+PASS: tsc absent
 
-Health verification:
-Container health status: healthy
-Health endpoint returned:
+Health check:
+healthy
+
+Health endpoint:
 {"status":"healthy","service":"kijanikiosk-payments","version":"1.0.0"}
-
-Killercoda rebuild:
-Tag: kk-payments:1.0.0-4fff20d
-Docker image listing size: 168 MB
-Container runtime listing size: 171 MB
-Image inspect: User=kijani; HEALTHCHECK configured.
-
-Acceptance note:
-The image-size requirement of less than 100 MB was not met. The 61.4 MB content-size figure is not the same as the 239 MB Docker image size. Both measurements are recorded without treating content size as a pass.
+UPX verification: passed (upx -t /tmp/node)
