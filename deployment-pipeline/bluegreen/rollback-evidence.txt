@@ -1,0 +1,15 @@
+KijaniKiosk Automatic Rollback Evidence
+Date: 2026-11-04
+
+[2026-11-04 09:23:32] [MONITOR] Watching green on port 3001 for 60s
+[2026-11-04 09:23:36] [MONITOR FAIL] Health check failed for green
+[2026-11-04 09:23:36] [MONITOR FAIL] ROLLBACK TRIGGERED
+[2026-11-04 09:23:36] [ROLLBACK] Returned traffic to blue
+
+Proxy verification:
+{"status":"healthy","service":"kijanikiosk-payments","version":"1.3.0"}
+
+Result:
+Automatic rollback succeeded. Nginx served Blue version 1.3.0.
+The monitor detected failure approximately 4 seconds after monitoring began.
+Exact fault-to-recovery duration was not measured.
