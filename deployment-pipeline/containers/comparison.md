@@ -29,9 +29,18 @@ The container approach uses a different recovery model. Kubernetes can maintain 
 
 ## Measured results and limitations
 
-The production image was reported by Docker with a content size of 61.4 MB and disk usage of approximately 239 MB. These are different measurements and should not be treated as interchangeable. The content size is below 100 MB, but the unpacked disk usage is above that threshold. A single-stage baseline image was not measured, so an image-size reduction percentage cannot honestly be calculated.
+Both the multi-stage production image and the single-stage baseline were built successfully using the same Node 22 Alpine base image and application. Docker reported the following measurements:
 
-Kubernetes self-healing time was also not measured because a cluster was not deployed and tested in this environment. The Deployment and Service configurations were created, but Pod readiness, replacement time, service endpoints and in-cluster DNS resolution remain unverified. These limitations are important when interpreting the results: configuration files demonstrate the intended design, not a successful cluster deployment.
+| Measurement | Multi-stage | Single-stage |
+|---|---:|---:|
+| Disk usage | 239 MB | 242 MB |
+| Content size | 61.4 MB | 61.9 MB |
+
+The multi-stage image was approximately 3 MB smaller in disk usage and 0.5 MB smaller in content size. This represents a modest improvement rather than a major reduction. The small difference is expected because this application has no declared external dependencies and its build process simply copies one JavaScript file into the distribution directory. Both images were built, and the single-stage baseline successfully returned a healthy response through its health endpoint. Docker's disk usage and content size are different measurements and should not be treated as interchangeable.
+
+Kubernetes was tested in a remote Killercoda cluster using a ConfigMap-mounted copy of the application source and the public `node:22-alpine` image. The Deployment reached 2/2 available replicas, and both application Pods reported 1/1 Ready with zero restarts. A ClusterIP Service exposed port 3001 and forwarded traffic to container port 3000. Its endpoints included both application Pod IP addresses. An in-cluster Node.js HTTP request using the Service DNS name returned HTTP 200 and a healthy application response for version 1.0.0.
+
+The Kubernetes test did not use the locally built production image or verify access to the project's local container registry. Pod replacement was not tested because the remote lab session expired before the planned deletion test. Consequently, Kubernetes replica readiness, Service endpoint discovery, internal DNS resolution and application connectivity were verified, but Pod replacement and self-healing recovery time remain unverified. These limitations are important when interpreting the results.
 
 ## What containers do not solve
 
@@ -41,4 +50,4 @@ The Blue/Green exercise demonstrated the value of keeping a known healthy versio
 
 ## Next project
 
-The next Kubernetes orchestration project should deploy the application to a functioning cluster, configure registry access securely, verify that both replicas become ready, and test replacement of a deleted Pod while recording actual timestamps. It should also verify NodePort access, service discovery and application health. Configuration values that differ between environments should be externalized, while sensitive values should be stored in Kubernetes Secrets or an appropriate secret-management system. Finally, a future iteration should measure a single-stage baseline against the production image using the same measurement method.
+A future Kubernetes iteration should configure secure access to the production image registry, deploy the exact production image, and test replacement of a deleted Pod while recording recovery timestamps. It could also verify external access through NodePort and compare the behaviour of the production image with the ConfigMap-based lab deployment. Configuration values that differ between environments should be externalized, while sensitive values should be stored in Kubernetes Secrets or an appropriate secret-management system. The single-stage baseline has now been built and measured. A future iteration could explore a more dependency-heavy application to demonstrate a more substantial benefit from separating build and runtime stages.
