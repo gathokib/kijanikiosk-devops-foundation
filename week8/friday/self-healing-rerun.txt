@@ -1,0 +1,13 @@
+KijaniKiosk Kubernetes Self-Healing Verification
+Date: 2026-11-04
+
+Deleted pod: kk-payments-77dbfb744b-5f54f
+T0: 2026-11-04T16:40:00+00:00
+Replacement pod: kk-payments-77dbfb744b-d257z
+T1: 2026-11-04T16:40:31+00:00
+Measured self-healing time: 31 seconds
+
+Final state:
+2/2 Pods Running and Ready.
+
+Result: PASS

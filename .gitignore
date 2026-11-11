@@ -1,0 +1,5 @@
+ci/.env
+node_modules/
+dist/
+*.tgz
+/capstone/floci-data/

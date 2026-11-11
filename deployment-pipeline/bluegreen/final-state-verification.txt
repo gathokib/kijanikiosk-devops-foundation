@@ -1,0 +1,10 @@
+KijaniKiosk Blue/Green Final State Verification
+Date: 2026-11-04
+
+Active environment: blue
+Previous environment: green
+Nginx upstream: http://10.0.2.2:3000
+Expected active version: 1.3.0
+
+Result:
+Rollback state confirmed. Nginx routes traffic to Blue.

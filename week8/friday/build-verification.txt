@@ -1,0 +1,24 @@
+WEEK 8 PRODUCTION BUILD VERIFICATION
+Date: 2026-11-04T20:39:59+03:00
+
+Build command:
+docker build --no-cache -f week8/friday/Dockerfile.production -t kk-payments:week8 .
+
+Image size:
+97258010 bytes
+
+Node version:
+v22.23.4
+
+Runtime user:
+kijani
+
+TypeScript compiler:
+PASS: tsc absent
+
+Health check:
+healthy
+
+Health endpoint:
+{"status":"healthy","service":"kijanikiosk-payments","version":"1.0.0"}
+UPX verification: passed (upx -t /tmp/node)

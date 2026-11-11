@@ -1,0 +1,23 @@
+groups:
+  - name: kijanikiosk-payments
+    rules:
+      - alert: KijaniPaymentsReplicasUnavailable
+        expr: |
+          kube_deployment_status_replicas_available{
+            namespace="kijani-staging",
+            deployment="kk-payments"
+          }
+          <
+          kube_deployment_spec_replicas{
+            namespace="kijani-staging",
+            deployment="kk-payments"
+          }
+        for: 2m
+        labels:
+          severity: warning
+          service: kijanikiosk-payments
+        annotations:
+          summary: KijaniKiosk payments replicas are unavailable
+          description: >
+            The staging payments deployment has fewer available replicas
+            than desired for more than two minutes.

@@ -1,0 +1,22 @@
+WEEK 8 PRIVATE REGISTRY PUSH AND FRESH-PULL VERIFICATION
+
+Version: 1.0.0
+Git short SHA: 1e541ed
+Image tag: 1.0.0-1e541ed
+Registry image: localhost:5000/kk-payments:1.0.0-1e541ed
+
+Tag generation:
+VERSION=$(node -p "require('./package.json').version")
+GIT_SHA=$(git rev-parse --short=7 HEAD)
+IMAGE_TAG="${VERSION}-${GIT_SHA}"
+
+Push:
+docker push localhost:5000/kk-payments:1.0.0-1e541ed
+
+Push digest:
+sha256:b9ccea331af0ef347bf9b65be48588429c02c086a73f6e65f73194d5c4b35d6c
+
+Fresh-pull verification:
+The local registry tag was removed, then the image was pulled again successfully from localhost:5000.
+
+Credentials were not committed to the repository.

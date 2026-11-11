@@ -1,0 +1,33 @@
+---
+- name: Configure KijaniKiosk staging application
+  hosts: localhost
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Apply payments Deployment
+      ansible.builtin.command:
+        cmd: kubectl apply -n kijani-staging -f {{ playbook_dir }}/../kubernetes/deployment.yaml
+      changed_when: "'configured' in result.stdout or 'created' in result.stdout"
+      register: result
+
+    - name: Apply payments Service
+      ansible.builtin.command:
+        cmd: kubectl apply -n kijani-staging -f {{ playbook_dir }}/../kubernetes/service.yaml
+      register: service_result
+      changed_when: "'configured' in service_result.stdout or 'created' in service_result.stdout"
+
+    - name: Wait for payments Deployment
+      ansible.builtin.command:
+        cmd: kubectl rollout status deployment/kk-payments -n kijani-staging --timeout=60s
+      changed_when: false
+
+    - name: Verify payments pods
+      ansible.builtin.command:
+        cmd: kubectl get pods -n kijani-staging -l app=kk-payments
+      register: pod_result
+      changed_when: false
+
+    - name: Display verified pods
+      ansible.builtin.debug:
+        var: pod_result.stdout_lines
