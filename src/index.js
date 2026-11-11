@@ -1,6 +1,11 @@
+
 'use strict';
 
 const http = require('node:http');
+const {
+  S3Client,
+  PutObjectCommand
+} = require('@aws-sdk/client-s3');
 
 function loadConfig(env = process.env) {
   return {
@@ -36,8 +41,23 @@ function validatePayment(payment) {
   };
 }
 
-function createServer(config = loadConfig()) {
-  return http.createServer((req, res) => {
+function createServer(config = loadConfig(), dependencies = {}) {
+  const bucket = process.env.RECEIPTS_BUCKET || '';
+  const endpoint = process.env.AWS_ENDPOINT_URL || '';
+
+  const s3 = dependencies.s3Client || new S3Client({
+    region: process.env.AWS_REGION || 'us-east-1',
+    ...(endpoint ? {
+      endpoint,
+      forcePathStyle: true,
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID || 'test',
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || 'test'
+      }
+    } : {})
+  });
+
+  return http.createServer(async (req, res) => {
     res.setHeader('Content-Type', 'application/json');
 
     if (req.url === '/health') {
@@ -51,13 +71,63 @@ function createServer(config = loadConfig()) {
       }));
     }
 
-    if (req.url === '/') {
+    if (req.url === '/' && req.method === 'GET') {
       res.writeHead(200);
       return res.end(JSON.stringify({
         service: 'kijanikiosk-payments',
         version: config.version,
         environment: config.environment
       }));
+    }
+
+    if (req.url === '/payments' && req.method === 'POST') {
+      try {
+        if (!bucket) {
+          res.writeHead(503);
+          return res.end(JSON.stringify({
+            error: 'Receipt storage is not configured'
+          }));
+        }
+
+        let raw = '';
+        for await (const chunk of req) {
+          raw += chunk;
+          if (raw.length > 10000) {
+            throw new Error('Request body too large');
+          }
+        }
+
+        const payment = validatePayment(JSON.parse(raw));
+
+        const receipt = {
+          ...payment,
+          service: 'kijanikiosk-payments',
+          environment: config.environment,
+          createdAt: new Date().toISOString(),
+          status: 'received'
+        };
+
+        await s3.send(new PutObjectCommand({
+          Bucket: bucket,
+          Key: `${payment.reference}.json`,
+          Body: JSON.stringify(receipt),
+          ContentType: 'application/json'
+        }));
+
+        res.writeHead(201);
+        return res.end(JSON.stringify({
+          message: 'Payment receipt stored successfully',
+          receipt
+        }));
+      } catch (error) {
+        const status = error instanceof TypeError ||
+          error instanceof SyntaxError ? 400 : 500;
+
+        res.writeHead(status);
+        return res.end(JSON.stringify({
+          error: status === 400 ? error.message : 'Payment processing failed'
+        }));
+      }
     }
 
     res.writeHead(404);

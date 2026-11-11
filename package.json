@@ -15,5 +15,9 @@
   "license": "UNLICENSED",
   "files": [
     "dist/"
-  ]
+  ],
+  "dependencies": {
+    "@aws-sdk/client-lambda": "^3.1166.0",
+    "@aws-sdk/client-s3": "^3.1166.0"
+  }
 }
