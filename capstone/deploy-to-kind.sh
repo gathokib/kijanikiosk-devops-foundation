@@ -35,10 +35,34 @@ kubectl apply -n "$NAMESPACE" -f capstone/kubernetes/service.yaml
 kubectl rollout status deployment/kk-payments \
   -n "$NAMESPACE" --timeout=120s
 
+PORT_FORWARD_LOG="/tmp/${TARGET}-port-forward.log"
+
 kubectl port-forward service/kk-payments "${PORT}:3000" \
-  -n "$NAMESPACE" >/tmp/"${TARGET}"-port-forward.log 2>&1 &
+  -n "$NAMESPACE" >"$PORT_FORWARD_LOG" 2>&1 &
 PF_PID=$!
 trap 'kill "$PF_PID" 2>/dev/null || true' EXIT
+
+READY=0
+for attempt in $(seq 1 15); do
+  if ! kill -0 "$PF_PID" 2>/dev/null; then
+    echo "Port-forward exited unexpectedly:"
+    cat "$PORT_FORWARD_LOG"
+    exit 1
+  fi
+
+  if grep -q "Forwarding from" "$PORT_FORWARD_LOG"; then
+    READY=1
+    break
+  fi
+
+  sleep 1
+done
+
+if [ "$READY" -ne 1 ]; then
+  echo "Port-forward did not become ready:"
+  cat "$PORT_FORWARD_LOG"
+  exit 1
+fi
 
 node --input-type=module - "$PORT" "$EXPECTED_ENV" <<'NODE'
 const port = Number(process.argv[2]);
@@ -54,7 +78,11 @@ for (let attempt = 1; attempt <= 20; attempt++) {
       console.log('Smoke test passed:', JSON.stringify(body));
       process.exit(0);
     }
-  } catch {}
+
+    console.log(`Attempt ${attempt}: HTTP ${response.status}, environment=${body.environment}`);
+  } catch (error) {
+    console.log(`Attempt ${attempt}: ${error.message}`);
+  }
 
   await new Promise(resolve => setTimeout(resolve, 1000));
 }
