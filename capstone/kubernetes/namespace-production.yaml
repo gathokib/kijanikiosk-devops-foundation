@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kijani-production
+  labels:
+    app.kubernetes.io/part-of: kijanikiosk
+    environment: production
