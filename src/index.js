@@ -2,6 +2,14 @@
 
 const http = require('node:http');
 
+function loadConfig(env = process.env) {
+  return {
+    version: env.APP_VERSION || '1.0.0',
+    environment: env.APP_ENV || 'development',
+    dbHost: env.DB_HOST || ''
+  };
+}
+
 function validatePayment(payment) {
   if (!payment || typeof payment !== 'object') {
     throw new TypeError('Payment must be an object');
@@ -28,9 +36,7 @@ function validatePayment(payment) {
   };
 }
 
-function createServer() {
-  const version = process.env.APP_VERSION || '1.0.0';
-
+function createServer(config = loadConfig()) {
   return http.createServer((req, res) => {
     res.setHeader('Content-Type', 'application/json');
 
@@ -39,7 +45,9 @@ function createServer() {
       return res.end(JSON.stringify({
         status: 'healthy',
         service: 'kijanikiosk-payments',
-        version
+        version: config.version,
+        environment: config.environment,
+        databaseConfigured: Boolean(config.dbHost)
       }));
     }
 
@@ -47,7 +55,8 @@ function createServer() {
       res.writeHead(200);
       return res.end(JSON.stringify({
         service: 'kijanikiosk-payments',
-        version
+        version: config.version,
+        environment: config.environment
       }));
     }
 
@@ -57,11 +66,14 @@ function createServer() {
 }
 
 if (require.main === module) {
+  const config = loadConfig();
   const port = Number(process.env.PORT || 3000);
 
-  createServer().listen(port, '0.0.0.0', () => {
-    console.log(`KijaniKiosk v${process.env.APP_VERSION || '1.0.0'} listening on ${port}`);
+  createServer(config).listen(port, '0.0.0.0', () => {
+    console.log(
+      `KijaniKiosk v${config.version} (${config.environment}) listening on ${port}`
+    );
   });
 }
 
-module.exports = { validatePayment, createServer };
+module.exports = { validatePayment, loadConfig, createServer };

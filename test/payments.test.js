@@ -47,3 +47,52 @@ test('rejects malformed currency codes', () => {
     /three-letter uppercase code/
   );
 });
+
+const { loadConfig, createServer } = require('../src/index');
+
+test('loads staging environment configuration', () => {
+  const config = loadConfig({
+    APP_VERSION: '1.0.0',
+    APP_ENV: 'staging',
+    DB_HOST: 'staging-db.internal'
+  });
+
+  assert.deepEqual(config, {
+    version: '1.0.0',
+    environment: 'staging',
+    dbHost: 'staging-db.internal'
+  });
+});
+
+test('uses safe defaults when environment variables are absent', () => {
+  const config = loadConfig({});
+
+  assert.deepEqual(config, {
+    version: '1.0.0',
+    environment: 'development',
+    dbHost: ''
+  });
+});
+
+test('health endpoint reports environment without exposing DB host', async (t) => {
+  const server = createServer({
+    version: '1.0.0',
+    environment: 'staging',
+    dbHost: 'staging-db.internal'
+  });
+
+  await new Promise((resolve) => server.listen(0, '127.0.0.1', resolve));
+  t.after(() => new Promise((resolve, reject) => {
+    server.close((error) => error ? reject(error) : resolve());
+  }));
+
+  const response = await fetch(
+    `http://127.0.0.1:${server.address().port}/health`
+  );
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.environment, 'staging');
+  assert.equal(body.databaseConfigured, true);
+  assert.equal(JSON.stringify(body).includes('staging-db.internal'), false);
+});
